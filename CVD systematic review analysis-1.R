@@ -187,25 +187,25 @@ subset_cvd$horizon <- ifelse(grepl("Lifetime", subset_cvd$horizon), "Lifetime",
                                     subset_cvd$horizon))
 
 ###Model Outcomes###
-# Search for "Ischemic heart disease" in the risk variable
+# Search for "Ischemic heart disease" in the outcome variable
 subset_cvd$ihd <- ifelse(grepl("Ischemic heart |ischemic heart|infarction|Coronary|coronary|congestive|Congestive", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Coronary heart disease" in the risk variable
+# Search for "Stroke" in the outcome variable
 subset_cvd$stroke <- ifelse(grepl("Stroke |stroke", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Coronary heart disease" in the risk variable
+# Search for "CVA" in the outcome variable
 subset_cvd$cva <- ifelse(grepl("Cerebrovascular |derebrovascular|CVA", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Coronary heart disease" in the risk variable
+# Search for "HHD" in the outcome variable
 subset_cvd$hhd <- ifelse(grepl("hypertensive |HHD", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Coronary heart disease" in the risk variable
+# Search for "Angina" in the outcome variable
 subset_cvd$angina <- ifelse(grepl("Angina |angina", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Cardiac Arrest" in the risk variable
+# Search for "Cardiac Arrest" in the outcome variable
 subset_cvd$ca <- ifelse(grepl("Cardiac Arrest| arrest", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
-# Search for "Atherosclerosis" in the risk variable
+# Search for "Atherosclerosis" in the outcome variable
 subset_cvd$athero <- ifelse(grepl("athero", subset_cvd$cvd_outcomes, ignore.case = TRUE), 1, 0)
 
 
@@ -267,7 +267,8 @@ p5 <- ggplot(subset_cvd) +
 
 p5
 
-p6 <- p1+p2+p3+p4+p5  ####Pete to advise on what is important here
+p6 <- p1+p2+p4+p5  ####Pete to advise on what is important here
+ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
 p6
 ###########Characteristics of DAMs####################
 ####Evaluation type####
