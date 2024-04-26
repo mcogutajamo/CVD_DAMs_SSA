@@ -324,17 +324,19 @@ p12 <- ggplot(outcome_long, aes(outcome, number)) +
 
 p12
 
+p13 <- p7+p8+p9+p10+p11+p12
+
+
+
+ggsave(file = "plot2.pdf", plot = p13, width = 20, height = 5)
+
 ####Type of sensitivity analysis####
-p13 <- ggplot(subset_cvd, aes(sensitivity)) +
+p14 <- ggplot(subset_cvd, aes(sensitivity)) +
   geom_bar(stat = "count") +
   labs(x = "Sensityvity analysis", y= "Count of Studies", title = "Type of sensitivity analysis") +
   theme(plot.title = element_text(hjust = 0.5))
 
-p13
-
-
-p14 <- p7+p8+p9+p10+p11+p12+p13
-
-
 p14
-ggsave(file = "plot2.pdf", plot = p13, width = 20, height = 5)
+
+
+
