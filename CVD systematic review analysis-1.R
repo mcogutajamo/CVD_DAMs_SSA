@@ -4,6 +4,7 @@ library(tidyverse)
 library(ggplot2)
 library(patchwork)  ### for combining plots
 library(ggthemes)
+library(ggpubr)
 
 ## setting working directory
 ## setwd("U:/ManWin/My Documents/James Oguta/My PhD Folder-2023-2024/My Systematic Review/Synthesis/Tables/Final/Analyses")
@@ -240,17 +241,18 @@ p1
 ## going to assume these are separate studies rather than both needing coding as multicountry
 ## TODO check and correct
 
-dataset_long$study <- as.character(dataset_long$study)
+dataset_long$study <- as.character(dataset_long$study) #to char for editing
 dataset_long$study[grepl("Lin", dataset_long$study) & grepl("South", dataset_long$country)] <- "Lin et al. (2019a)"
 dataset_long$study[grepl("Lin", dataset_long$study) & grepl("Nigeria", dataset_long$country)] <- "Lin et al. (2019b)"
 dataset_long$study <- factor(dataset_long$study,
   levels = unique(dataset_long$study),
   ordered = TRUE
 )
-
-## make factor:
+## make factor again:
 dataset_long$country <- factor(dataset_long$country, levels = unique(dataset_long$country),
                                ordered = TRUE)
+
+
 ## select colors:
 clz <- tableau_color_pal("Tableau 10")(10)
 sclz <- clz[as.integer((dataset_long$country))] # manual study colors
@@ -258,16 +260,19 @@ names(sclz) <- dataset_long$study               #making named colors
 
 p2 <- ggplot(dataset_long,
              aes(x = country,
-                 fill = study)) + #as.factor(study)
+                 fill = study)) +
   geom_bar(stat = "count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5)) +  # Center the title
   scale_y_continuous(breaks = seq(0, 27, 1)) +
-  labs(x = "Country", y = "Count of studies") +
-  ## scale_fill_discrete(name = "Study") +
-  scale_fill_manual(values=sclz)## +
-  ## ggtitle("Number of Studies per Country")
+  labs(x = "Country", y = "Count") +
+  scale_fill_manual(values=sclz)+
+  theme_classic() + grids()
 p2
+
+## TODO might make sense to order the countries meaningfully:
+## eg alphabetcal + multicountry, geographically, or by county
+
 
 # To create a bar graph using ggplot2- Alternative 2
 p3 <- ggplot(dataset_long, aes(x = country, y = number)) +
@@ -276,23 +281,38 @@ p3 <- ggplot(dataset_long, aes(x = country, y = number)) +
 
 p3
 
-# Graphing year of publication by prevention type-Pete to advise on this.
 
+## relevel logically
+subset_cvd$prevention <- factor(subset_cvd$prevention,
+  levels = unique(subset_cvd$prevention)[c(1, 4, 5, 2, 3)],
+  ordered = TRUE
+)
+
+# Graphing year of publication by prevention type-Pete to advise on this.
+## TODO it's a bit weird to use these different-sized age bins - makes it hard to interpret trend
 p4 <- ggplot(subset_cvd) + 
   geom_bar(aes(x = yearcat, fill = prevention), position = "stack") + 
-  labs(x = "year")+
-  scale_y_continuous(breaks = 0:13)
+  labs(x = "Year",y="Count")+
+  scale_fill_gdocs()+
+  scale_y_continuous(breaks = 0:13)+
+  theme_classic() + grids() +
+  theme(legend.position = c(0.2,0.8))
 p4
 
 # Graphing intervention by prevention type
 
+
 p5 <- ggplot(subset_cvd) + 
   geom_bar(aes(prevention, fill = intervention), position = "stack") + 
-  labs(x = "Type of prevention")
-
+  labs(x = "Type of prevention",y="Count") +
+  scale_fill_colorblind()+
+  theme_classic() + grids() +
+  theme(legend.position = c(0.8, 0.8))
 p5
 
-p6 <- p1+p2+p4+p5  ####Pete to advise on what is important here
+p6 <- p2 / (p4 + p5) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold"))
 p6
 
 ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
