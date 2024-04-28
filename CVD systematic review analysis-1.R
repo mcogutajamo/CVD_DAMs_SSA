@@ -1,10 +1,12 @@
-library(geofacet)
+## library(geofacet)
 library(data.table)
 library(tidyverse)
 library(ggplot2)
 library(patchwork)  ### for combining plots
-# setting working directory
-setwd("U:/ManWin/My Documents/James Oguta/My PhD Folder-2023-2024/My Systematic Review/Synthesis/Tables/Final/Analyses")
+library(ggthemes)
+
+## setting working directory
+## setwd("U:/ManWin/My Documents/James Oguta/My PhD Folder-2023-2024/My Systematic Review/Synthesis/Tables/Final/Analyses")
 # reading datasets
 cvd_data<- read.csv("Final Dataset.csv")
 
@@ -234,14 +236,37 @@ p1 <- ggplot(subset_cvd, aes(yearcat)) +
 p1
 
 # Plotting combinations of studies in each country
-p2 <- ggplot(dataset_long, aes(x = country, fill = as.factor(study))) +
+## NOTE Lin 2019: down as Nigeria and South Africa
+## going to assume these are separate studies rather than both needing coding as multicountry
+## TODO check and correct
+
+dataset_long$study <- as.character(dataset_long$study)
+dataset_long$study[grepl("Lin", dataset_long$study) & grepl("South", dataset_long$country)] <- "Lin et al. (2019a)"
+dataset_long$study[grepl("Lin", dataset_long$study) & grepl("Nigeria", dataset_long$country)] <- "Lin et al. (2019b)"
+dataset_long$study <- factor(dataset_long$study,
+  levels = unique(dataset_long$study),
+  ordered = TRUE
+)
+
+## make factor:
+dataset_long$country <- factor(dataset_long$country, levels = unique(dataset_long$country),
+                               ordered = TRUE)
+## select colors:
+clz <- tableau_color_pal("Tableau 10")(10)
+sclz <- clz[as.integer((dataset_long$country))] # manual study colors
+names(sclz) <- dataset_long$study               #making named colors
+
+p2 <- ggplot(dataset_long,
+             aes(x = country,
+                 fill = study)) + #as.factor(study)
   geom_bar(stat = "count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(hjust = 0.5)) +  # Center the title
   scale_y_continuous(breaks = seq(0, 27, 1)) +
-  labs(x = "Country", y = "Count of Studies") +
-  scale_fill_discrete(name = "Study") +
-  ggtitle("Number of Studies per Country")
+  labs(x = "Country", y = "Count of studies") +
+  ## scale_fill_discrete(name = "Study") +
+  scale_fill_manual(values=sclz)## +
+  ## ggtitle("Number of Studies per Country")
 p2
 
 # To create a bar graph using ggplot2- Alternative 2
@@ -268,8 +293,10 @@ p5 <- ggplot(subset_cvd) +
 p5
 
 p6 <- p1+p2+p4+p5  ####Pete to advise on what is important here
-ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
 p6
+
+ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
+
 ###########Characteristics of DAMs####################
 ####Evaluation type####
 p7 <- ggplot(subset_cvd, aes(evaluation)) +
