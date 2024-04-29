@@ -46,7 +46,7 @@ names(cvd_data) <- gsub("\\.", "", names(cvd_data))
  str(cvd_data)
  
 #selecting a subset of variables
- selected <- c("authors", "country", "year", "evaluation", "prevention", "intervention", "cvd_outcomes",
+ selected <- c("id", "authors", "country", "year", "evaluation", "prevention", "intervention", "cvd_outcomes",
                "multimorbidity", "model", "risk", "perspective", "d_rate", "start_age", "horizon", "cyclelength",
                "outcomemeasure", "equity", "sensitivity", "evpi", "ceacf", "validation", "callibration",
                "adaptation", "funding", "conflict")
@@ -62,6 +62,7 @@ str(subset_cvd)
 #defining factor variables
 cvd <- cvd_data %>% 
   mutate_at(to_factor, as.factor)
+
 
 # Creating a subset of country dataset###
 country <- cvd %>% select(id, authors, country)
@@ -138,7 +139,8 @@ subset_cvd$yearcat <- ifelse(subset_cvd$year<2010, "2005-2009",
 
 subset_cvd$prevention <- ifelse(subset_cvd$intervention=="Diet","Primordial",
                                 ifelse(subset_cvd$intervention=="Multiple interventions", "Multiple",
-                                       subset_cvd$prevention))
+                                       ifelse(subset_cvd$intervention=="Tobacco control","Primordial",
+                                       subset_cvd$prevention)))
 
 subset_cvd$prevention <- ifelse(subset_cvd$prevention=="Both","Primary & Secondary",
                                 subset_cvd$prevention)
@@ -213,7 +215,7 @@ subset_cvd$athero <- ifelse(grepl("athero", subset_cvd$cvd_outcomes, ignore.case
 
 
 outcome_columns <- c("ihd", "stroke", "cva", "angina","ca","athero" )
-outcome_wide <- subset_cvd[, ..risk_columns,drop=FALSE] # the .. syntax within the square brackets to select columns dynamically
+outcome_wide <- subset_cvd[, ..outcome_columns,drop=FALSE] # the .. syntax within the square brackets to select columns dynamically
 
 # Reshape data into a long format
 outcome_long <- reshape2::melt(as.matrix(outcome_wide), id.vars = "authors", variable.name = "outcome", value.name = "number")
@@ -223,6 +225,48 @@ authors <- cvd_data$authors
 colnames(outcome_long)[colnames(outcome_long) == "Var1"] ="study"
 colnames(outcome_long)[colnames(outcome_long) == "Var2"] ="outcome"
 
+########################################################################################################################
+###Creating a subset of the dataset to select a few variables for characteristics
+
+to_subset <- c("id", "authors", "country", "year", "evaluation", "prevention", "intervention", "model")
+
+# Creating a subset of study characteristics dataset###
+characteristics <- subset_cvd %>% select(id, authors, country, year, evaluation,prevention,intervention, model)
+characteristics$year <- as.character(subset_cvd$year)
+
+# renaming authors to study
+characteristics<-rename(characteristics, study= authors)
+
+##Duplicating Lin 2019 and assigning it to Nigeria (b) and South Africa (a)
+
+# Filter the dataframe to select the observation to duplicate Lin et al 2019 
+observation_to_duplicate <- characteristics %>% filter(study == "Lin et al. (2019)") %>% slice(1)
+##renaming/assigning the original variable to south africa before appending
+characteristics$study[grepl("Lin", characteristics$study) & grepl("South", characteristics$country)] <- "Lin et al. (2019a)"
+characteristics$country[grepl("Lin", characteristics$study) & grepl("South", characteristics$country)] <- "South Africa"
+
+# Duplicate the selected observation and append it to the original dataframe
+characteristics <- bind_rows(characteristics, observation_to_duplicate)
+
+#renaming/assigning duplicate variable to Nigeria
+characteristics$study[grepl("Lin", characteristics$study) & grepl("Nigeria", characteristics$country)] <- "Lin et al. (2019b)"
+characteristics$country[grepl("Lin", characteristics$study) & grepl("Nigeria", characteristics$country)] <- "Nigeria"
+###Changing Gaziano et al 2015 (Guatemala, Mexico and South Africa to South Africa for graphing
+characteristics$country[grepl("Gaziano", characteristics$study) & grepl("Guatemala", characteristics$country)] <- "South Africa"
+
+characteristics$country[grepl("Multicountry", characteristics$country)] <- "Multicountry"
+
+str(characteristics)
+
+## Create factor variables
+characteristics$country <- factor(characteristics$country, levels = unique(characteristics$country),
+                               ordered = TRUE)
+characteristics$prevention <- factor(characteristics$prevention, levels = unique(characteristics$prevention),
+                                  ordered = FALSE)
+characteristics$intervention <- factor(characteristics$intervention, levels = unique(characteristics$intervention),
+                                     ordered = FALSE)
+characteristics$model <- factor(characteristics$model, levels = unique(characteristics$model),
+                                       ordered = FALSE)
 
 ### Characteristics of Included Studies###############
 ###General characteristics#########
@@ -248,9 +292,13 @@ dataset_long$study <- factor(dataset_long$study,
   levels = unique(dataset_long$study),
   ordered = TRUE
 )
+
+table(dataset_long$study)
+summary(dataset_long$study)
 ## make factor again:
 dataset_long$country <- factor(dataset_long$country, levels = unique(dataset_long$country),
                                ordered = TRUE)
+
 
 
 ## select colors:
@@ -289,7 +337,7 @@ subset_cvd$prevention <- factor(subset_cvd$prevention,
 )
 
 # Graphing year of publication by prevention type-Pete to advise on this.
-## TODO it's a bit weird to use these different-sized age bins - makes it hard to interpret trend
+## TODO it's a bit weird to use these different-sized age bins - makes it hard to interpret trend- To discuss
 p4 <- ggplot(subset_cvd) + 
   geom_bar(aes(x = yearcat, fill = prevention), position = "stack") + 
   labs(x = "Year",y="Count")+
@@ -317,74 +365,122 @@ p6
 
 ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
 
-###########Characteristics of DAMs####################
-####Evaluation type####
-p7 <- ggplot(subset_cvd, aes(evaluation)) +
-  geom_bar(stat = "count") +
-  labs(x = "Evaluation type", y= "Count of Studies", title = "Type of Evaluation") +
-  theme(plot.title = element_text(hjust = 0.5))
 
+# Graphing prevention level and intervention type by country
+
+
+p7 <- ggplot(characteristics) + 
+  geom_bar(aes(country, fill = prevention), position = "stack") + 
+  labs(x = "Type of prevention by country",y="Count") +
+  scale_fill_colorblind()+
+  theme_classic() + grids() +
+  theme(legend.position = c(0.8, 0.8))
 p7
 
 
-####Model Typologies####
-p8 <- ggplot(subset_cvd, aes(model)) +
-  geom_bar(stat = "count") +
-  labs(x = "Model type", y= "Count of Studies", title = "Type of Model") +
-  theme(plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(breaks = 0:13)
-
+p8 <- ggplot(characteristics) + 
+  geom_bar(aes(x = country, fill = intervention), position = "stack") + 
+  labs(x = "Type of intervention by country",y="Count")+
+  scale_fill_gdocs()+
+  scale_y_continuous(breaks = 0:8)+
+  theme_classic() + grids() +
+  theme(legend.position = c(0.8,0.8))
 p8
 
-####Evaluation type####
-p9 <- ggplot(subset_cvd, aes(perspective)) +
-  geom_bar(stat = "count") +
-  labs(x = "Perspective", y= "Count of Studies", title = "Perspective of Evaluation") +
-  theme(plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(breaks = 0:11)
-
+p9 <- p7 / p8 +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold"))
 p9
+ggsave(file = "plot2.pdf", plot = p9, width = 16, height = 10)
 
-####Horizon####
-p10 <- ggplot(subset_cvd, aes(horizon)) +
-  geom_bar(stat = "count") +
-  labs(x = "Time Horizon", y= "Count of Studies", title = "Time Horizon") +
-  theme(plot.title = element_text(hjust = 0.5))
 
+
+
+
+
+###########Characteristics of DAMs####################
+####Model type####
+p10 <- ggplot(characteristics) + 
+  geom_bar(aes(country, fill = model), position = "stack") + 
+  labs(x = "Type of model by country",y="Count") +
+  scale_fill_colorblind()+
+  theme_classic() + grids() +
+  theme(legend.position = c(0.8, 0.8))
 p10
 
-
-# To create a bar graph of CVD risk equations
-
-p11 <- ggplot(risk_long, aes(risk, number)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Risk equation", y = "No of studies", title = "CVD Risk Equations") +
+p11 <- ggplot(characteristics, aes(model)) +
+  geom_bar(stat = "count") +
+  scale_y_continuous(breaks = 0:25)+
+  labs(x = "Model type", y= "Count") +
   theme(plot.title = element_text(hjust = 0.5))
 
 p11
 
-# To create a bar graph of CVD Outcomes
 
-p12 <- ggplot(outcome_long, aes(outcome, number)) +
-  geom_bar(stat = "identity") +
-  labs(x = "CVD Outcome", y = "No of studies", title = "CVD Outcome") +
+
+####Evaluation type####
+p12 <- ggplot(characteristics, aes(evaluation)) +
+  geom_bar(stat = "count") +
+  scale_y_continuous(breaks = 0:25)+
+  labs(x = "Evaluation type", y= "Count") +
   theme(plot.title = element_text(hjust = 0.5))
 
 p12
 
-p13 <- p7+p8+p9+p10+p11+p12
 
+####Perspective####
+p13 <- ggplot(subset_cvd, aes(perspective)) +
+  geom_bar(stat = "count") +
+  labs(x = "Perspective", y= "Count") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_y_continuous(breaks = 0:11)
 
+p13
 
-ggsave(file = "plot2.pdf", plot = p13, width = 20, height = 5)
+####Horizon####
+p14 <- ggplot(subset_cvd, aes(horizon)) +
+  geom_bar(stat = "count") +
+  labs(x = "Time Horizon", y= "Count") +
+  scale_y_continuous(breaks = 0:20)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+p14
+
+# To create a bar graph of CVD risk equations
+
+p15 <- ggplot(risk_long, aes(risk, number)) +
+  geom_bar(stat = "identity") +
+  labs(x = "CVD Risk equation", y = "Count") +
+  scale_y_continuous(breaks = 0:11)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+p15
+
+# To create a bar graph of CVD Outcomes
+
+p16 <- ggplot(outcome_long, aes(outcome, number)) +
+  geom_bar(stat = "identity") +
+  labs(x = "CVD Outcome", y = "Count") +
+  scale_y_continuous(breaks = 0:25)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+p16
+
+p17 <- (p12+p11)/(p13+p14)/(p15+p16)+
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold"))
+
+p17
+
+ggsave(file = "plot3.pdf", plot = p17, width = 20, height = 11)
 
 ####Type of sensitivity analysis####
-p14 <- ggplot(subset_cvd, aes(sensitivity)) +
+p18 <- ggplot(subset_cvd, aes(sensitivity)) +
   geom_bar(stat = "count") +
   labs(x = "Sensityvity analysis", y= "Count of Studies", title = "Type of sensitivity analysis") +
   theme(plot.title = element_text(hjust = 0.5))
 
-p14
+p18
 
 
 
