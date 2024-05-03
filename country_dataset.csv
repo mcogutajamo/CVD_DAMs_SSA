@@ -1,0 +1,28 @@
+"id","authors","country","Cameroon","South.Africa","Nigeria","Ghana","Kenya","Uganda","Tanzania","Ethiopia","Multicountry"
+1,"Aminde et al. (2019)","Cameroon",1,0,0,0,0,0,0,0,0
+2,"Aminde et al. (2020)","Cameroon",1,0,0,0,0,0,0,0,0
+3,"Basu et al. (2019)","South Africa",0,1,0,0,0,0,0,0,0
+4,"Basu et al. (2021)","Multicountry",0,0,0,0,0,0,0,0,1
+5,"Bertram et al. (2021)","Multicountry",0,0,0,0,0,0,0,0,1
+6,"Davari et al. (2022)","Ethiopia",0,0,0,0,0,0,0,1,0
+7,"Ekwunife et al. (2013)","Nigeria",0,0,1,0,0,0,0,0,0
+8,"Gad et al. (2020)","Ghana",0,0,0,1,0,0,0,0,0
+9,"Gaziano et al. (2005)","South Africa",0,1,0,0,0,0,0,0,0
+10,"Gaziano et al. (2006)","Multicountry study",0,0,0,0,0,0,0,0,1
+11,"Gaziano et al. (2014)","South Africa",0,1,0,0,0,0,0,0,0
+12,"Gaziano et al. (2015)","Guatemala, Mexico and South Africa",0,1,0,0,0,0,0,0,0
+13,"Kasaie et al. (2020)","Kenya",0,0,0,0,1,0,0,0,0
+14,"Lim et al. (2007)","Multicountry",0,0,0,0,0,0,0,0,1
+15,"Lin et al. (2019)","China, India, Mexico, Nigeria, South Africa",0,1,1,0,0,0,0,0,0
+16,"Manyema et al. (2016)","South Africa",0,1,0,0,0,0,0,0,0
+17,"Ngalesoni et al. (2016a)","Tanzania",0,0,0,0,0,0,1,0,0
+18,"Ngalesoni et al. (2016b)","Tanzania",0,0,0,0,0,0,1,0,0
+19,"Ngalesoni et al. (2017)","Tanzania",0,0,0,0,0,0,1,0,0
+20,"Ortegon et al. (2012)","Multicountry",0,0,0,0,0,0,0,0,1
+21,"Pozo-Martin et al. (2021)","Ghana",0,0,0,1,0,0,0,0,0
+22,"Robberstad et al. (2007)","Tanzania",0,0,0,0,0,0,1,0,0
+23,"Rosendaal et al. (2016)","Nigeria",0,0,1,0,0,0,0,0,0
+24,"Sando et al. (2020)","Uganda",0,0,0,0,0,1,0,0,0
+25,"Subramanian et al. (2019)","Kenya",0,0,0,0,1,0,0,0,0
+26,"Tolla et al. (2016)","Ethiopia",0,0,0,0,0,0,0,1,0
+27,"Watkins et al. (2015)","South Africa",0,1,0,0,0,0,0,0,0

@@ -144,8 +144,10 @@ subset_cvd$prevention <- ifelse(subset_cvd$intervention=="Diet","Primordial",
 
 subset_cvd$prevention <- ifelse(subset_cvd$prevention=="Both","Primary & Secondary",
                                 subset_cvd$prevention)
+subset_cvd$intervention <- ifelse(subset_cvd$intervention=="HSS","Health Systems Strengthening",
+                                subset_cvd$intervention)
 
-subset_cvd$model <- ifelse(subset_cvd$model=="Proportional multi-state life table Markov model","PMLTMM",
+subset_cvd$model <- ifelse(subset_cvd$model=="Proportional multi-state life table Markov model","Multistate Life table model",
                            ifelse(subset_cvd$model=="Mathematical functions", 
                                   "Mathematical Equations",
                                   ifelse(subset_cvd$model=="Cohort Markov model", "Markov", subset_cvd$model))) 
@@ -183,6 +185,11 @@ risk_long <- risk_long[risk_long$number > 0, ]  # Keep only rows where disease i
 authors <- cvd_data$authors
 colnames(risk_long)[colnames(risk_long) == "Var1"] ="study"
 colnames(risk_long)[colnames(risk_long) == "Var2"] ="risk"
+
+risk_long$risk <- ifelse(risk_long$risk=="framingham","Framingham",
+                         ifelse(risk_long$risk== "who", "WHO",
+                                ifelse(risk_long$risk== "globorisk", "Globorisk",
+                                       ifelse(risk_long$risk=="cox", "Cox Model",risk_long$risk))))
 
 
 ####Cleaning the horizon column
@@ -224,6 +231,14 @@ outcome_long <- outcome_long[outcome_long$number > 0, ]  # Keep only rows where 
 authors <- cvd_data$authors
 colnames(outcome_long)[colnames(outcome_long) == "Var1"] ="study"
 colnames(outcome_long)[colnames(outcome_long) == "Var2"] ="outcome"
+
+outcome_long$outcome <- ifelse(outcome_long$outcome=="ihd","Ischemic Heart Disease",
+                         ifelse(outcome_long$outcome=="stroke","Stroke",
+                                ifelse(outcome_long$outcome=="angina","Angina",
+                                       ifelse(outcome_long$outcome=="ca","Cardiac Arrest",
+                                              ifelse(outcome_long$outcome=="cva","Cerebrovascular Accident",
+                                                     ifelse(outcome_long$outcome=="athero","Atherosclerosis",outcome_long$outcome))))))
+                                              
 
 ########################################################################################################################
 ###Creating a subset of the dataset to select a few variables for characteristics
@@ -358,23 +373,26 @@ p5 <- ggplot(subset_cvd) +
   theme(legend.position = c(0.8, 0.8))
 p5
 
-p6 <- p2 / (p4 + p5) +
+p6 <- p2 / (p4 + plot_spacer()+ p5) +
   plot_annotation(tag_levels = "A") &
   theme(plot.tag = element_text(face = "bold"))
 p6
 
-ggsave(file = "plot1.pdf", plot = p6, width = 16, height = 10)
-
+ggsave(file = "plot1.pdf", plot = p6, width = 20, height = 11)
+ggsave(file = "plot1.png", plot = p6, width = 20, height = 11, dpi = 300)
 
 # Graphing prevention level and intervention type by country
+## make factor again:
 
+characteristics$country <- factor(characteristics$country, levels = unique(dataset_long$country),
+                               ordered = TRUE)
 
 p7 <- ggplot(characteristics) + 
   geom_bar(aes(country, fill = prevention), position = "stack") + 
   labs(x = "Type of prevention by country",y="Count") +
   scale_fill_colorblind()+
   theme_classic() + grids() +
-  theme(legend.position = c(0.8, 0.8))
+  theme(legend.position = c(0.6, 0.8))
 p7
 
 
@@ -384,7 +402,7 @@ p8 <- ggplot(characteristics) +
   scale_fill_gdocs()+
   scale_y_continuous(breaks = 0:8)+
   theme_classic() + grids() +
-  theme(legend.position = c(0.8,0.8))
+  theme(legend.position = c(0.6,0.8))
 p8
 
 p9 <- p7 / p8 +
@@ -392,9 +410,7 @@ p9 <- p7 / p8 +
   theme(plot.tag = element_text(face = "bold"))
 p9
 ggsave(file = "plot2.pdf", plot = p9, width = 16, height = 10)
-
-
-
+ggsave(file = "plot2.png", plot = p9, width = 16, height = 10, dpi = 300)
 
 
 
@@ -405,7 +421,7 @@ p10 <- ggplot(characteristics) +
   labs(x = "Type of model by country",y="Count") +
   scale_fill_colorblind()+
   theme_classic() + grids() +
-  theme(legend.position = c(0.8, 0.8))
+  theme(legend.position = c(0.5, 0.8))
 p10
 
 p11 <- ggplot(characteristics, aes(model)) +
@@ -473,11 +489,12 @@ p17 <- (p12+p11)/(p13+p14)/(p15+p16)+
 p17
 
 ggsave(file = "plot3.pdf", plot = p17, width = 20, height = 11)
+ggsave(file = "plot3.png", plot = p17, width = 20, height = 11, dpi = 300)
 
 ####Type of sensitivity analysis####
 p18 <- ggplot(subset_cvd, aes(sensitivity)) +
   geom_bar(stat = "count") +
-  labs(x = "Sensityvity analysis", y= "Count of Studies", title = "Type of sensitivity analysis") +
+  labs(x = "Sensitivity analysis", y= "Count", title = "Type of sensitivity analysis") +
   theme(plot.title = element_text(hjust = 0.5))
 
 p18
