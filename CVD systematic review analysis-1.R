@@ -390,7 +390,7 @@ characteristics$country <- factor(characteristics$country, levels = unique(datas
 p7 <- ggplot(characteristics) + 
   geom_bar(aes(country, fill = prevention), position = "stack") + 
   labs(x = "Type of prevention by country",y="Count") +
-  scale_fill_colorblind()+
+  scale_fill_gdocs()+
   theme_classic() + grids() +
   theme(legend.position = c(0.6, 0.8))
 p7
@@ -399,7 +399,7 @@ p7
 p8 <- ggplot(characteristics) + 
   geom_bar(aes(x = country, fill = intervention), position = "stack") + 
   labs(x = "Type of intervention by country",y="Count")+
-  scale_fill_gdocs()+
+  scale_fill_colorblind()+
   scale_y_continuous(breaks = 0:8)+
   theme_classic() + grids() +
   theme(legend.position = c(0.6,0.8))
@@ -428,6 +428,7 @@ p11 <- ggplot(characteristics, aes(model)) +
   geom_bar(stat = "count") +
   scale_y_continuous(breaks = 0:25)+
   labs(x = "Model type", y= "Count") +
+  theme_classic() + grids() +
   theme(plot.title = element_text(hjust = 0.5))
 
 p11
@@ -439,6 +440,7 @@ p12 <- ggplot(characteristics, aes(evaluation)) +
   geom_bar(stat = "count") +
   scale_y_continuous(breaks = 0:25)+
   labs(x = "Evaluation type", y= "Count") +
+  theme_classic() + grids() +
   theme(plot.title = element_text(hjust = 0.5))
 
 p12
@@ -449,7 +451,8 @@ p13 <- ggplot(subset_cvd, aes(perspective)) +
   geom_bar(stat = "count") +
   labs(x = "Perspective", y= "Count") +
   theme(plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(breaks = 0:11)
+  scale_y_continuous(breaks = 0:11)+
+  theme_classic() + grids() 
 
 p13
 
@@ -458,7 +461,8 @@ p14 <- ggplot(subset_cvd, aes(horizon)) +
   geom_bar(stat = "count") +
   labs(x = "Time Horizon", y= "Count") +
   scale_y_continuous(breaks = 0:20)+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme_classic() + grids() 
 
 p14
 
@@ -468,7 +472,8 @@ p15 <- ggplot(risk_long, aes(risk, number)) +
   geom_bar(stat = "identity") +
   labs(x = "CVD Risk equation", y = "Count") +
   scale_y_continuous(breaks = 0:11)+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme_classic() + grids() 
 
 p15
 
@@ -478,13 +483,15 @@ p16 <- ggplot(outcome_long, aes(outcome, number)) +
   geom_bar(stat = "identity") +
   labs(x = "CVD Outcome", y = "Count") +
   scale_y_continuous(breaks = 0:25)+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme_classic() + grids() 
 
 p16
 
 p17 <- (p12+p11)/(p13+p14)/(p15+p16)+
   plot_annotation(tag_levels = "A") &
-  theme(plot.tag = element_text(face = "bold"))
+  theme(plot.tag = element_text(face = "bold"))+
+  theme_classic() + grids() 
 
 p17
 
