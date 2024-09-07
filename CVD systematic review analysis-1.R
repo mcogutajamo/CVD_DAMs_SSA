@@ -5,6 +5,7 @@ library(ggplot2)
 library(patchwork)  ### for combining plots
 library(ggthemes)
 library(ggpubr)
+library(viridis)
 
 ## setting working directory
 ## setwd("U:/ManWin/My Documents/James Oguta/My PhD Folder-2023-2024/My Systematic Review/Synthesis/Tables/Final/Analyses")
@@ -144,7 +145,7 @@ subset_cvd$prevention <- ifelse(subset_cvd$intervention=="Diet","Primordial",
 
 subset_cvd$prevention <- ifelse(subset_cvd$prevention=="Both","Primary & Secondary",
                                 subset_cvd$prevention)
-subset_cvd$intervention <- ifelse(subset_cvd$intervention=="HSS","Health Systems Strengthening",
+subset_cvd$intervention <- ifelse(subset_cvd$intervention=="HSS","Implementation Science",
                                 subset_cvd$intervention)
 
 subset_cvd$model <- ifelse(subset_cvd$model=="Proportional multi-state life table Markov model","Multistate Life table model",
@@ -373,6 +374,8 @@ p5 <- ggplot(subset_cvd) +
   theme(legend.position = c(0.8, 0.8))
 p5
 
+
+
 p6 <- p2 / (p4 + plot_spacer()+ p5) +
   plot_annotation(tag_levels = "A") &
   theme(plot.tag = element_text(face = "bold"))
@@ -416,13 +419,58 @@ ggsave(file = "plot2.png", plot = p9, width = 16, height = 10, dpi = 300)
 
 ###########Characteristics of DAMs####################
 ####Model type####
+
 p10 <- ggplot(characteristics) + 
   geom_bar(aes(country, fill = model), position = "stack") + 
-  labs(x = "Type of model by country",y="Count") +
-  scale_fill_colorblind()+
-  theme_classic() + grids() +
-  theme(legend.position = c(0.5, 0.8))
+  labs(x = "Type of model by country", y = "Count", fill="Model") +
+  scale_fill_brewer(palette = "Set1") +  # Or scale_fill_brewer(palette = "Set1")
+  theme_classic() +
+  theme(
+    panel.grid.major = element_line(),  # To add major grid lines
+    panel.grid.minor = element_line(),  # To add minor grid lines
+    legend.position = c(0.5, 0.8)
+  )
+
 p10
+
+
+
+p10a <- ggplot(characteristics) + 
+  geom_bar(aes(prevention, fill = model), position = "stack") + 
+  labs(x = "Type of model by prevention level", y = "Count", fill="Model") +
+  scale_fill_brewer(palette = "Set1") +  # Or scale_fill_brewer(palette = "Set1")
+  theme_classic() +
+  theme(
+    panel.grid.major = element_line(),  # To add major grid lines
+    panel.grid.minor = element_line(),  # To add minor grid lines
+    legend.position = "none"            # Omits the legend
+  )
+
+p10a
+
+
+p10b <- ggplot(characteristics) + 
+  geom_bar(aes(intervention, fill = model), position = "stack") + 
+  labs(x = "Type of model by intervention type", y = "Count", fill="Model") +
+  scale_fill_brewer(palette = "Set1") +  # Or scale_fill_brewer(palette = "Set1")
+  theme_classic() +
+  theme(
+    panel.grid.major = element_line(),  # To add major grid lines
+    panel.grid.minor = element_line(),  # To add minor grid lines
+    legend.position = "none"  # Omits the legend
+  )
+
+p10b
+
+
+p10c <- p10 / (p10a + p10b) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold"))
+p10c
+
+ggsave(file = "plot3.pdf", plot = p10c, width = 16, height = 10)
+ggsave(file = "plot3.png", plot = p10c, width = 16, height = 10, dpi = 300)
+
 
 p11 <- ggplot(characteristics, aes(model)) +
   geom_bar(stat = "count") +
@@ -495,8 +543,8 @@ p17 <- (p12+p11)/(p13+p14)/(p15+p16)+
 
 p17
 
-ggsave(file = "plot3.pdf", plot = p17, width = 20, height = 11)
-ggsave(file = "plot3.png", plot = p17, width = 20, height = 11, dpi = 300)
+ggsave(file = "plot4.pdf", plot = p17, width = 20, height = 11)
+ggsave(file = "plot4.png", plot = p17, width = 20, height = 11, dpi = 300)
 
 ####Type of sensitivity analysis####
 p18 <- ggplot(subset_cvd, aes(sensitivity)) +
@@ -505,6 +553,8 @@ p18 <- ggplot(subset_cvd, aes(sensitivity)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 p18
+
+write.csv(cvd_data, "cvd_data.csv")
 
 
 
