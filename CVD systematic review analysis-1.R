@@ -1,3 +1,4 @@
+rm (list=ls())
 ## library(geofacet)
 library(data.table)
 library(tidyverse)
@@ -334,6 +335,9 @@ p2 <- ggplot(dataset_long,
   theme_classic() + grids()
 p2
 
+ggsave(file = "fig1.pdf", plot = p2, width = 20, height = 11)
+ggsave(file = "fig1.png", plot = p2, width = 20, height = 11, dpi = 300)
+
 ## TODO might make sense to order the countries meaningfully:
 ## eg alphabetcal + multicountry, geographically, or by county
 
@@ -363,6 +367,10 @@ p4 <- ggplot(subset_cvd) +
   theme(legend.position = c(0.2,0.8))
 p4
 
+ggsave(file = "fig2.pdf", plot = p4, width = 20, height = 11)
+ggsave(file = "fig2.png", plot = p4, width = 20, height = 11, dpi = 300)
+
+
 # Graphing intervention by prevention type
 
 
@@ -374,6 +382,8 @@ p5 <- ggplot(subset_cvd) +
   theme(legend.position = c(0.8, 0.8))
 p5
 
+ggsave(file = "fig3.pdf", plot = p5, width = 20, height = 11)
+ggsave(file = "fig3.png", plot = p5, width = 20, height = 11, dpi = 300)
 
 
 p6 <- p2 / (p4 + plot_spacer()+ p5) +
@@ -398,6 +408,10 @@ p7 <- ggplot(characteristics) +
   theme(legend.position = c(0.6, 0.8))
 p7
 
+ggsave(file = "fig4.pdf", plot = p7, width = 20, height = 11)
+ggsave(file = "fig4.png", plot = p7, width = 20, height = 11, dpi = 300)
+
+
 
 p8 <- ggplot(characteristics) + 
   geom_bar(aes(x = country, fill = intervention), position = "stack") + 
@@ -407,6 +421,9 @@ p8 <- ggplot(characteristics) +
   theme_classic() + grids() +
   theme(legend.position = c(0.6,0.8))
 p8
+
+ggsave(file = "fig5.pdf", plot = p8, width = 20, height = 11)
+ggsave(file = "fig5.png", plot = p8, width = 20, height = 11, dpi = 300)
 
 p9 <- p7 / p8 +
   plot_annotation(tag_levels = "A") &
@@ -433,6 +450,9 @@ p10 <- ggplot(characteristics) +
 
 p10
 
+ggsave(file = "fig6.pdf", plot = p10, width = 20, height = 11)
+ggsave(file = "fig6.png", plot = p10, width = 20, height = 11, dpi = 300)
+
 
 
 p10a <- ggplot(characteristics) + 
@@ -448,6 +468,8 @@ p10a <- ggplot(characteristics) +
 
 p10a
 
+ggsave(file = "fig7.pdf", plot = p10a, width = 20, height = 11)
+ggsave(file = "fig7.png", plot = p10a, width = 20, height = 11, dpi = 300)
 
 p10b <- ggplot(characteristics) + 
   geom_bar(aes(intervention, fill = model), position = "stack") + 
@@ -461,6 +483,9 @@ p10b <- ggplot(characteristics) +
   )
 
 p10b
+
+ggsave(file = "fig8.pdf", plot = p10b, width = 20, height = 11)
+ggsave(file = "fig8.png", plot = p10b, width = 20, height = 11, dpi = 300)
 
 
 p10c <- p10 / (p10a + p10b) +
@@ -481,7 +506,8 @@ p11 <- ggplot(characteristics, aes(model)) +
 
 p11
 
-
+ggsave(file = "fig9.pdf", plot = p11, width = 20, height = 11)
+ggsave(file = "fig9.png", plot = p11, width = 20, height = 11, dpi = 300)
 
 ####Evaluation type####
 p12 <- ggplot(characteristics, aes(evaluation)) +
@@ -492,6 +518,9 @@ p12 <- ggplot(characteristics, aes(evaluation)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 p12
+
+ggsave(file = "fig10.pdf", plot = p12, width = 20, height = 11)
+ggsave(file = "fig10.png", plot = p12, width = 20, height = 11, dpi = 300)
 
 
 ####Perspective####
@@ -504,6 +533,9 @@ p13 <- ggplot(subset_cvd, aes(perspective)) +
 
 p13
 
+ggsave(file = "fig11.pdf", plot = p13, width = 20, height = 11)
+ggsave(file = "fig11.png", plot = p13, width = 20, height = 11, dpi = 300)
+
 ####Horizon####
 p14 <- ggplot(subset_cvd, aes(horizon)) +
   geom_bar(stat = "count") +
@@ -513,6 +545,9 @@ p14 <- ggplot(subset_cvd, aes(horizon)) +
   theme_classic() + grids() 
 
 p14
+
+ggsave(file = "fig12.pdf", plot = p14, width = 20, height = 11)
+ggsave(file = "fig12.png", plot = p14, width = 20, height = 11, dpi = 300)
 
 # To create a bar graph of CVD risk equations
 
@@ -525,6 +560,9 @@ p15 <- ggplot(risk_long, aes(risk, number)) +
 
 p15
 
+ggsave(file = "fig13.pdf", plot = p15, width = 20, height = 11)
+ggsave(file = "fig13.png", plot = p15, width = 20, height = 11, dpi = 300)
+
 # To create a bar graph of CVD Outcomes
 
 p16 <- ggplot(outcome_long, aes(outcome, number)) +
@@ -535,6 +573,8 @@ p16 <- ggplot(outcome_long, aes(outcome, number)) +
   theme_classic() + grids() 
 
 p16
+ggsave(file = "fig14.pdf", plot = p16, width = 20, height = 11)
+ggsave(file = "fig14.png", plot = p16, width = 20, height = 11, dpi = 300)
 
 p17 <- (p12+p11)/(p13+p14)/(p15+p16)+
   plot_annotation(tag_levels = "A") &
